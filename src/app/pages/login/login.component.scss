@@ -1,0 +1,11 @@
+@use 'styles/variables' as *;
+
+.brand-badge {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, $color-primario, $color-mint);
+  color: #ffffff;
+  font-size: to-rem(22px);
+  @include flex-centro;
+}

@@ -1,0 +1,115 @@
+@use 'styles/variables' as *;
+
+.menu-group {
+  margin-bottom: space(1.5);
+
+  &.nested-group {
+    margin-bottom: space(0.5);
+  }
+
+  .group-header {
+    width: 100%;
+    border: none;
+    background: transparent;
+    color: $color-sidebar-texto;
+    @include flex-entre;
+    padding: 7px 10px;
+    font-size: to-rem(11px);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+
+    &.nested-header {
+      text-transform: none;
+      letter-spacing: normal;
+      font-size: to-rem(13px);
+      font-weight: 600;
+      padding: 8px 12px;
+      border-radius: 8px;
+      color: #cbd5e1;
+
+      &:hover {
+        background-color: $color-sidebar-hover;
+        color: #ffffff;
+      }
+    }
+
+    &:hover {
+      color: #e2e8f0;
+    }
+
+    .group-title {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      text-align: left;
+    }
+
+    .chevron {
+      font-size: to-rem(10px);
+    }
+  }
+
+  .submenu-list {
+    list-style: none;
+    margin: 2px 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    &.nested-list {
+      margin-left: 12px;
+      padding-left: 8px;
+      border-left: 1px solid rgba(255, 255, 255, 0.1);
+    }
+  }
+}
+
+.menu-link {
+  @include flex-entre;
+  padding: 9px 12px;
+  border-radius: 8px;
+  color: $color-sidebar-texto;
+  font-size: to-rem(13.5px);
+  font-weight: 500;
+  @include transicion-suave;
+
+  &.nested-link {
+    padding: 6px 10px;
+    font-size: to-rem(12.5px);
+  }
+
+  .link-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+
+    i {
+      font-size: to-rem(15px);
+      flex-shrink: 0;
+    }
+  }
+
+  &:hover {
+    background-color: $color-sidebar-hover;
+    color: #ffffff;
+  }
+
+  &.active {
+    background-color: $color-primario;
+    color: $color-sidebar-texto-activo;
+    font-weight: 600;
+  }
+
+  .badge-count {
+    padding: 2px 7px;
+    border-radius: $radio-pill;
+    background-color: rgba(255, 255, 255, 0.16);
+    color: #ffffff;
+    font-size: to-rem(11px);
+    font-weight: 700;
+  }
+}

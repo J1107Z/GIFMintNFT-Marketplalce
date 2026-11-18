@@ -1,0 +1,47 @@
+<div class="search-wrap" [class.focused]="enfocado()">
+  <form class="search-form" (ngSubmit)="onSubmit()">
+    <i class="bi bi-search search-icon"></i>
+    <input
+      type="text"
+      name="searchQuery"
+      class="search-input"
+      [(ngModel)]="termino"
+      [placeholder]="placeholder"
+      autocomplete="off"
+      (focus)="onFocus($event)"
+      (blur)="onBlur($event)"
+      (input)="onInput($event)"
+      (keydown)="onKeydown($event)"
+    />
+    @if (termino.trim().length > 0) {
+      <button type="submit" class="search-go-btn">Buscar</button>
+    }
+  </form>
+
+  @if (enfocado() && sugerencias().length > 0) {
+    <div class="trie-dropdown">
+      <div class="trie-header">
+        <span><i class="bi bi-stars"></i> Sugerencias populares</span>
+        <span>{{ sugerencias().length }} resultados</span>
+      </div>
+      @for (s of sugerencias(); track s.name) {
+        <button
+          type="button"
+          class="trie-option"
+          (mousedown)="elegirSugerencia(s)"
+        >
+          <span class="trie-left">
+            <i class="bi bi-search"></i>
+            <span class="trie-text">{{ s.payload?.titulo || s.name }}</span>
+          </span>
+          <span class="trie-meta font-mono-nft">
+            @if (s.payload) {
+              <span>${{ s.payload.precio }}</span>
+            }
+            <span class="pop-pill">★ {{ s.popularity }}</span>
+          </span>
+        </button>
+      }
+    </div>
+  }
+</div>

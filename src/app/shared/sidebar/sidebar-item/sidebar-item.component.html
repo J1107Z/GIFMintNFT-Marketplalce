@@ -1,0 +1,55 @@
+@if (esVisible(node.value)) {
+  @if (!node.isLeaf()) {
+    <div class="menu-group" [class.nested-group]="depth > 0">
+      <button
+        type="button"
+        class="group-header"
+        [class.nested-header]="depth > 0"
+        (click)="onToggleGroup()"
+      >
+        <span class="group-title">
+          <i class="bi" [class]="node.value.icon"></i>
+          <span>{{ node.value.title }}</span>
+        </span>
+        <i
+          class="bi chevron"
+          [class.bi-chevron-down]="node.expanded"
+          [class.bi-chevron-right]="!node.expanded"
+        ></i>
+      </button>
+
+      @if (node.expanded) {
+        <ul class="submenu-list" [class.nested-list]="depth > 0">
+          @for (child of node.children; track child.value.title + child.value.link + (child.value.queryParams?.['cat'] || '')) {
+            <li>
+              <app-sidebar-item
+                [node]="child"
+                [depth]="depth + 1"
+                (itemSelected)="itemSelected.emit($event)"
+              />
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  } @else {
+    <a
+      class="menu-link"
+      [class.nested-link]="depth > 1"
+      [routerLink]="node.value.link"
+      [queryParams]="node.value.queryParams ?? null"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="node.value.queryParams ? exactRouteOptions : (node.value.link === '/' ? exactRouteOptions : pathOnlyOptions)"
+      (click)="onClickLink(node.value)"
+    >
+      <span class="link-left">
+        <i class="bi" [class]="node.value.icon"></i>
+        <span>{{ node.value.title }}</span>
+      </span>
+
+      @if (obtenerBadge(node.value.badgeKey) > 0) {
+        <span class="badge-count font-mono-nft">{{ obtenerBadge(node.value.badgeKey) }}</span>
+      }
+    </a>
+  }
+}

@@ -1,0 +1,88 @@
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Mi Perfil</h1>
+    <p class="page-subtitle">Administra tu información personal y foto de perfil</p>
+  </div>
+</div>
+
+@if (mensaje()) {
+  <div class="alert alert-success py-2 px-3 small mb-3">{{ mensaje() }}</div>
+}
+@if (error()) {
+  <div class="alert alert-danger py-2 px-3 small mb-3">{{ error() }}</div>
+}
+
+<div class="profile-grid">
+  <section class="surface-card">
+    <div class="avatar-header">
+      <div class="avatar-preview">
+        @if (avatarUrl() || authHook.perfil()?.avatar_url) {
+          <img
+            [src]="avatarUrl() || authHook.perfil()?.avatar_url"
+            alt="Avatar de usuario"
+          />
+        } @else {
+          <span>{{ authHook.nombreVisible().charAt(0).toUpperCase() }}</span>
+        }
+      </div>
+
+      <div>
+        <h2 class="h5 fw-bold mb-1">{{ authHook.nombreVisible() }}</h2>
+        <div class="small text-muted mb-2">{{ authHook.usuario()?.email }}</div>
+        <span class="badge text-bg-primary text-uppercase font-mono-nft">
+          {{ authHook.rol() }}
+        </span>
+      </div>
+    </div>
+
+    <hr />
+
+    <div class="mb-3">
+      <label class="form-label small fw-bold">Foto de perfil</label>
+      <input
+        type="file"
+        accept="image/*"
+        class="form-control"
+        [disabled]="subiendo()"
+        (change)="subirAvatar($event)"
+      />
+      <div class="form-text">Formatos permitidos: PNG, JPG o GIF.</div>
+    </div>
+
+    <form (ngSubmit)="guardarNombre()">
+      <label class="form-label small fw-bold">Nombre público</label>
+      <div class="d-flex gap-2">
+        <input
+          type="text"
+          name="nombreEditable"
+          class="form-control"
+          [(ngModel)]="nombreEditable"
+          placeholder="Tu nombre de coleccionista"
+          required
+        />
+        <button type="submit" class="btn-mint-primary">Guardar</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="surface-card">
+    <h2 class="h6 fw-bold mb-3">
+      Resumen de Compras ({{ mintQueue.historialCompras().length }})
+    </h2>
+
+    @for (v of mintQueue.historialCompras().slice(0, 5); track v.id) {
+      <div class="purchase-row">
+        <div>
+          <div class="fw-bold small font-mono-nft">Orden #{{ v.id }}</div>
+          <div class="small text-muted">{{ v.created_at | date: 'short' }}</div>
+        </div>
+        <div class="text-end">
+          <div class="fw-bold">${{ v.total_usd }} USD</div>
+          <span class="status-pill" [class]="'status-' + v.estado">{{ v.estado }}</span>
+        </div>
+      </div>
+    } @empty {
+      <p class="text-muted small mb-0">Aún no tienes compras registradas.</p>
+    }
+  </section>
+</div>

@@ -1,0 +1,217 @@
+@use 'styles/variables' as *;
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  background-color: $color-fondo;
+  color: $color-texto;
+  font-family: $fuente-principal;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.font-mono-nft {
+  font-family: $fuente-mono;
+}
+
+// Superficies y contenedores globales
+.surface-card {
+  @include tarjeta-superficie(space(2.5));
+}
+
+.page-header {
+  @include flex-entre;
+  flex-wrap: wrap;
+  gap: space(2);
+  margin-bottom: space(3);
+
+  .page-title {
+    margin: 0;
+    font-size: to-rem(24px);
+    font-weight: 800;
+    color: $color-texto;
+    letter-spacing: -0.02em;
+  }
+
+  .page-subtitle {
+    margin: space(0.5) 0 0;
+    font-size: to-rem(14px);
+    color: $color-texto-suave;
+  }
+}
+
+// Badges de Rareza fieles a propuesta gráfica
+.rarity-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: $radio-pill;
+  font-size: to-rem(11px);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+
+  &.rarity-comun {
+    background-color: #f1f5f9;
+    color: #475569;
+  }
+
+  &.rarity-raro {
+    background-color: $color-primario-suave;
+    color: $color-primario-hover;
+  }
+
+  &.rarity-epico {
+    background-color: $color-epico-bg;
+    color: $color-epico;
+  }
+
+  &.rarity-legendario {
+    background-color: $color-alerta-bg;
+    color: $color-alerta;
+  }
+}
+
+// Badges de estado de ventas/órdenes
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: $radio-pill;
+  font-size: to-rem(12px);
+  font-weight: 600;
+  text-transform: capitalize;
+
+  &.status-pendiente {
+    background-color: $color-alerta-bg;
+    color: $color-alerta;
+  }
+
+  &.status-minteado {
+    background-color: $color-primario-suave;
+    color: $color-primario-hover;
+  }
+
+  &.status-completada {
+    background-color: $color-exito-bg;
+    color: $color-exito;
+  }
+}
+
+// Botones consistentes con el UI Kit
+.btn-mint-primary {
+  @include transicion-suave;
+  background-color: $color-primario;
+  color: #ffffff;
+  border: 1px solid $color-primario;
+  border-radius: $radio-boton;
+  padding: 9px 16px;
+  font-size: to-rem(14px);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background-color: $color-primario-hover;
+    border-color: $color-primario-hover;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.btn-mint-outline {
+  @include transicion-suave;
+  background-color: #ffffff;
+  color: $color-texto;
+  border: 1px solid $color-borde;
+  border-radius: $radio-boton;
+  padding: 8px 14px;
+  font-size: to-rem(13px);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background-color: #f1f5f9;
+    border-color: #cbd5e1;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// Pills de categoría
+.filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: space(1);
+
+  .filter-chip {
+    @include transicion-suave;
+    padding: 7px 16px;
+    border-radius: $radio-pill;
+    border: 1px solid $color-borde;
+    background-color: #ffffff;
+    color: $color-texto-secundario;
+    font-size: to-rem(13px);
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover {
+      border-color: #94a3b8;
+      color: $color-texto;
+    }
+
+    &.active {
+      background-color: $color-sidebar;
+      border-color: $color-sidebar;
+      color: #ffffff;
+    }
+  }
+}
+
+// Grilla de tarjetas GIF-NFT
+.nft-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
+  gap: space(2.5);
+}
+
+// Auth pages layout
+.auth-wrapper {
+  min-height: 100vh;
+  @include flex-centro;
+  padding: space(3);
+  background: radial-gradient(circle at top right, rgba($color-primario, 0.08), transparent 45%),
+    radial-gradient(circle at bottom left, rgba($color-mint, 0.08), transparent 45%),
+    $color-fondo;
+
+  .auth-card {
+    @include tarjeta-superficie(space(4));
+    width: 100%;
+    max-width: 420px;
+    box-shadow: $sombra-elevada;
+  }
+}

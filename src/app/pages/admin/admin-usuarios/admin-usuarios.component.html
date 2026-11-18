@@ -1,0 +1,59 @@
+<section class="surface-card">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h6 fw-bold mb-0">
+      Usuarios Registrados ({{ admin.usuarios().length }})
+    </h2>
+    <button type="button" class="btn-mint-outline btn-sm" (click)="admin.cargarUsuarios()">
+      <i class="bi bi-arrow-clockwise"></i> Actualizar
+    </button>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0 small">
+      <thead class="table-light">
+        <tr>
+          <th>Usuario</th>
+          <th>Correo</th>
+          <th>Rol Actual</th>
+          <th>Fecha Registro</th>
+          <th>Gestionar Rol</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (u of admin.usuarios(); track u.id) {
+          <tr>
+            <td class="fw-semibold">{{ u.nombre || 'Sin nombre' }}</td>
+            <td class="text-muted">{{ u.email }}</td>
+            <td>
+              <span
+                class="badge text-uppercase font-mono-nft"
+                [class.text-bg-primary]="u.rol === 'admin'"
+                [class.text-bg-secondary]="u.rol === 'cliente'"
+              >
+                {{ u.rol }}
+              </span>
+            </td>
+            <td>{{ u.created_at | date: 'short' }}</td>
+            <td>
+              <select
+                class="form-select form-select-sm"
+                style="max-width: 140px"
+                [value]="u.rol"
+                (change)="cambiarRol(u.id, $event)"
+              >
+                <option value="cliente">cliente</option>
+                <option value="admin">admin</option>
+              </select>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="5" class="text-center py-4 text-muted">
+              No se encontraron usuarios registrados.
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>

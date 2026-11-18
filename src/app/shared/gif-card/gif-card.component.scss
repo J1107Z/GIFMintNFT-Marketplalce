@@ -1,0 +1,173 @@
+@use 'styles/variables' as *;
+
+.nft-card {
+  @include tarjeta-superficie(space(1.5));
+  @include transicion-suave;
+  display: flex;
+  flex-direction: column;
+  gap: space(1.5);
+  cursor: pointer;
+
+  &:hover,
+  &.is-hovered {
+    transform: translateY(-3px);
+    border-color: rgba($color-primario, 0.35);
+    box-shadow: $sombra-elevada;
+  }
+
+  .nft-thumb-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 0.88;
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: #0f172a;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .fav-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      background: rgba(15, 23, 42, 0.68);
+      color: #ffffff;
+      @include flex-centro;
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+      @include transicion-suave;
+
+      &:hover {
+        background: rgba(15, 23, 42, 0.9);
+      }
+
+      &.active {
+        background: #ef4444;
+        border-color: #ef4444;
+      }
+    }
+
+    .cat-tag {
+      position: absolute;
+      bottom: 8px;
+      left: 8px;
+      padding: 2px 8px;
+      border-radius: $radio-pill;
+      background: rgba(15, 23, 42, 0.72);
+      color: #f8fafc;
+      font-size: to-rem(11px);
+      font-weight: 600;
+      backdrop-filter: blur(4px);
+    }
+
+    .hover-pill {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 9px;
+      border-radius: $radio-pill;
+      background: $color-primario;
+      color: #ffffff;
+      font-size: to-rem(11px);
+      font-weight: 600;
+    }
+  }
+
+  .nft-body {
+    display: flex;
+    flex-direction: column;
+    gap: space(1);
+    flex: 1;
+
+    .meta-row {
+      @include flex-entre;
+      gap: space(1);
+
+      .edition-tag {
+        font-size: to-rem(12px);
+        font-weight: 600;
+        color: $color-texto-suave;
+      }
+    }
+
+    .nft-title {
+      margin: 0;
+      font-size: to-rem(15px);
+      font-weight: 700;
+      color: $color-texto;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .price-row {
+      display: flex;
+      align-items: baseline;
+      gap: 5px;
+      margin-bottom: space(0.5);
+
+      .price-usd {
+        font-size: to-rem(14px);
+        font-weight: 800;
+        color: $color-texto;
+      }
+
+      .price-sep {
+        color: $color-texto-suave;
+        font-size: to-rem(12px);
+      }
+
+      .price-eth {
+        font-size: to-rem(12px);
+        font-weight: 500;
+        color: $color-mint;
+      }
+    }
+
+    .cart-action-btn {
+      @include transicion-suave;
+      margin-top: auto;
+      width: 100%;
+      padding: 8px 12px;
+      border-radius: $radio-boton;
+      border: 1px solid $color-borde;
+      background-color: #ffffff;
+      color: $color-texto;
+      font-size: to-rem(13px);
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+
+      &:hover {
+        background-color: $color-primario;
+        border-color: $color-primario;
+        color: #ffffff;
+      }
+
+      &.added {
+        background-color: $color-mint-suave;
+        border-color: rgba($color-mint, 0.35);
+        color: $color-mint;
+
+        &:hover {
+          background-color: $color-mint;
+          color: #ffffff;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,39 @@
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Mis Favoritos</h1>
+    <p class="page-subtitle">Coleccionables guardados en tu lista de seguimiento</p>
+  </div>
+
+  @if (cart.favoritos().length > 0) {
+    <div class="d-flex gap-2">
+      <button type="button" class="btn-mint-primary" (click)="agregarTodosAlCarrito()">
+        <i class="bi bi-bag-plus"></i> Pasar todos al carrito
+      </button>
+      <button type="button" class="btn-mint-outline" (click)="cart.limpiarFavoritos()">
+        Limpiar lista
+      </button>
+    </div>
+  }
+</div>
+
+<div class="nft-grid">
+  @for (nft of cart.favoritos(); track nft.id) {
+    <app-gif-card
+      [nft]="nft"
+      [isFavorite]="true"
+      [inCart]="cart.estaEnCarrito(nft.id)"
+      (toggleFavorite)="onToggleFavorite($event)"
+      (addToCart)="onAddToCart($event)"
+      (inspectNft)="onInspectNft($event)"
+    />
+  } @empty {
+    <div class="surface-card text-center py-5 grid-empty">
+      <i class="bi bi-heart fs-1 text-muted d-block mb-2"></i>
+      <h3 class="h5 fw-bold">Aún no tienes GIF-NFTs favoritos</h3>
+      <p class="text-muted small mb-3">
+        Explora el catálogo y pulsa el corazón en cualquier drop para guardarlo aquí.
+      </p>
+      <a routerLink="/catalogo" class="btn-mint-primary">Explorar catálogo</a>
+    </div>
+  }
+</div>

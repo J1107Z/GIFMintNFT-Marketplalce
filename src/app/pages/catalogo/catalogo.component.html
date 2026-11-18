@@ -1,0 +1,115 @@
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Catálogo GIFMint</h1>
+    <p class="page-subtitle">
+      @if (giphyHook.cargando() || giphyHook.cargandoInicial()) {
+        Explora y busca coleccionables animados en tiempo real
+      } @else {
+        {{ listaVisible().length }} coleccionables disponibles
+        @if (categoriaFiltro() !== 'Todas') {
+          en {{ categoriaFiltro() }}
+        }
+      }
+    </p>
+  </div>
+</div>
+
+<!-- Barra de búsqueda, filtros y ordenamiento -->
+<section class="surface-card mb-4">
+  <form class="catalog-search-row" (ngSubmit)="onBuscarSubmit()">
+    <div class="input-group">
+      <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+      <input
+        type="text"
+        name="catalogQuery"
+        class="form-control"
+        [(ngModel)]="terminoBusqueda"
+        placeholder="Buscar GIF-NFTs, colecciones o estilos..."
+      />
+      <button type="submit" class="btn-mint-primary">Buscar</button>
+    </div>
+
+    <div class="select-filters">
+      <select
+        class="form-select"
+        name="categoriaFiltro"
+        [ngModel]="categoriaFiltro()"
+        (ngModelChange)="cambiarCategoria($event)"
+      >
+        <option value="Todas">Todas las categorías</option>
+        @for (c of categorias; track c) {
+          <option [value]="c">{{ c }}</option>
+        }
+      </select>
+
+      <select
+        class="form-select"
+        name="rarezaFiltro"
+        [ngModel]="rarezaFiltro()"
+        (ngModelChange)="rarezaFiltro.set($event)"
+      >
+        <option value="Todas">Todas las rarezas</option>
+        @for (r of rarezas; track r) {
+          <option [value]="r">{{ r }}</option>
+        }
+      </select>
+
+      <select
+        class="form-select"
+        name="ordenSeleccionado"
+        [ngModel]="ordenSeleccionado()"
+        (ngModelChange)="ordenSeleccionado.set($event)"
+        aria-label="Ordenar por"
+      >
+        <option value="relevancia">Ordenar por: Relevancia</option>
+        <option value="precio_asc">Precio: Menor a Mayor</option>
+        <option value="precio_desc">Precio: Mayor a Menor</option>
+        <option value="popularidad">Más populares</option>
+      </select>
+
+      <button type="button" class="btn-mint-outline" (click)="limpiarFiltros()">Limpiar</button>
+    </div>
+  </form>
+
+  <div class="quick-tags-row mt-3">
+    <span class="text-muted small fw-semibold">Tendencias rápidas:</span>
+    @for (tag of sugerenciasRapidas; track tag) {
+      <button
+        type="button"
+        class="tag-pill"
+        (click)="terminoBusqueda = tag; onBuscarSubmit()"
+      >
+        #{{ tag }}
+      </button>
+    }
+  </div>
+</section>
+
+@if (giphyHook.error(); as err) {
+  <div class="alert alert-danger mb-4">{{ err }}</div>
+}
+
+@if (giphyHook.cargando() || giphyHook.cargandoInicial()) {
+  <app-loader message="Buscando coleccionables..." />
+} @else {
+  <div class="nft-grid">
+    @for (nft of listaVisible(); track nft.id) {
+      <app-gif-card
+        [nft]="nft"
+        [isFavorite]="cart.esFavorito(nft.id)"
+        [inCart]="cart.estaEnCarrito(nft.id)"
+        (toggleFavorite)="onToggleFavorite($event)"
+        (addToCart)="onAddToCart($event)"
+        (inspectNft)="onInspectNft($event)"
+      />
+    } @empty {
+      <div class="surface-card text-center py-5 grid-span-all">
+        <i class="bi bi-inbox fs-2 text-muted d-block mb-2"></i>
+        <p class="mb-2 fw-semibold">No hay GIF-NFTs que coincidan con tu filtro.</p>
+        <button type="button" class="btn-mint-outline" (click)="limpiarFiltros()">
+          Restablecer catálogo
+        </button>
+      </div>
+    }
+  </div>
+}

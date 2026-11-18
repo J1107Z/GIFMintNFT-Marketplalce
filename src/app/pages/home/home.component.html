@@ -1,0 +1,175 @@
+@if (catalog.cargandoInicial()) {
+  <app-loader message="Cargando drops destacados y colección..." />
+} @else {
+  <!-- Hero Showcase -->
+  @if (catalog.dropDestacadoActual(); as featured) {
+    <section class="hero-carousel">
+      <button
+        type="button"
+        class="carousel-arrow"
+        title="Drop anterior"
+        (click)="catalog.anteriorDropCircular()"
+      >
+        <i class="bi bi-chevron-left"></i>
+      </button>
+
+      <div class="hero-body">
+        <div class="hero-info">
+          <div class="hero-pill">
+            <i class="bi bi-stars"></i>
+            <span>Drop Destacado</span>
+          </div>
+          <h1 class="hero-title">{{ featured.titulo }}</h1>
+          <p class="hero-sub">
+            Coleccionable <span class="font-mono-nft">{{ featured.edicion }}</span> ·
+            {{ featured.categoria }} · Rareza <strong>{{ featured.rareza }}</strong>
+          </p>
+          <div class="hero-cta-row">
+            <div class="hero-price">
+              <span class="usd">${{ featured.precio }} USD</span>
+              <span class="eth font-mono-nft">/ {{ featured.precioEth }} ETH</span>
+            </div>
+            <a [routerLink]="['/nft', featured.id]" class="btn-mint-primary">Ver NFT</a>
+            <button type="button" class="btn-hero-ghost" (click)="onAddToCart(featured)">
+              <i class="bi bi-bag-plus"></i> Agregar
+            </button>
+          </div>
+        </div>
+
+        <div class="hero-media">
+          <img [src]="featured.gifUrl || featured.previewUrl" [alt]="featured.titulo" />
+        </div>
+      </div>
+
+      <button
+        type="button"
+        class="carousel-arrow"
+        title="Siguiente drop"
+        (click)="catalog.siguienteDropCircular()"
+      >
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </section>
+  }
+
+  <!-- Categorías del Mercado (una sola fila compacta con Todos + 3 mini cápsulas) -->
+  <section class="section-block">
+    <div class="section-head">
+      <div>
+        <h2 class="section-title">Categorías del Mercado</h2>
+        <p class="section-desc">Explora por estilo y colección</p>
+      </div>
+      <a routerLink="/catalogo" class="btn-mint-outline">
+        Explorar catálogo completo <i class="bi bi-arrow-right"></i>
+      </a>
+    </div>
+
+    <div class="categories-compact-row">
+      <button
+        type="button"
+        class="all-pill"
+        [class.active]="categoriaActiva() === 'Todos'"
+        (click)="seleccionarCategoria('Todos')"
+      >
+        Todos
+      </button>
+
+      @for (rama of ramasCategorias(); track rama.value.nombre) {
+        <div class="category-bubble-group">
+          <span class="bubble-title">{{ rama.value.nombre }}</span>
+          <div class="bubble-capsule">
+            @for (hoja of rama.children; track hoja.value.nombre) {
+              <button
+                type="button"
+                class="bubble-btn"
+                [class.selected]="categoriaActiva() === hoja.value.categoria"
+                (click)="seleccionarCategoria(hoja.value.categoria || 'Todos')"
+              >
+                {{ hoja.value.nombre }}
+              </button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- Top K Más Populares -->
+  <section class="section-block">
+    <div class="section-head">
+      <div>
+        <h2 class="section-title">
+          Top {{ catalog.topKCount() }} GIF-NFTs Más Populares
+        </h2>
+        <p class="section-desc">Los coleccionables más populares de la tienda</p>
+      </div>
+
+      <div class="topk-switcher">
+        @for (k of [4, 6, 8]; track k) {
+          <button
+            type="button"
+            class="k-btn font-mono-nft"
+            [class.active]="catalog.topKCount() === k"
+            (click)="cambiarTopK(k)"
+          >
+            Top {{ k }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="nft-grid">
+      @for (nft of catalog.topPopulares(); track nft.id) {
+        <app-gif-card
+          [nft]="nft"
+          [isFavorite]="cart.esFavorito(nft.id)"
+          [inCart]="cart.estaEnCarrito(nft.id)"
+          (toggleFavorite)="onToggleFavorite($event)"
+          (addToCart)="onAddToCart($event)"
+          (inspectNft)="onInspectNft($event)"
+        />
+      } @empty {
+        <div class="surface-card text-center text-muted">
+          No hay coleccionables destacados todavía.
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- Colección Filtrada -->
+  <section class="section-block">
+    <div class="section-head">
+      <div>
+        <h2 class="section-title">
+          Colección {{ categoriaActiva() === 'Todos' ? 'Destacada' : categoriaActiva() }}
+        </h2>
+        <p class="section-desc">
+          @if (categoriaActiva() === 'Todos') {
+            Mostrando {{ nftsFiltrados().length }} destacados de {{ catalog.resumenAnalitico().totalCount }} disponibles ·
+            Precio promedio: <strong>${{ catalog.resumenAnalitico().averagePrice }} USD</strong>
+          } @else {
+            {{ nftsFiltrados().length }} coleccionables en {{ categoriaActiva() }} ·
+            Precio promedio del catálogo: <strong>${{ catalog.resumenAnalitico().averagePrice }} USD</strong>
+          }
+        </p>
+      </div>
+    </div>
+
+    <div class="nft-grid">
+      @for (nft of nftsFiltrados(); track nft.id) {
+        <app-gif-card
+          [nft]="nft"
+          [isFavorite]="cart.esFavorito(nft.id)"
+          [inCart]="cart.estaEnCarrito(nft.id)"
+          (toggleFavorite)="onToggleFavorite($event)"
+          (addToCart)="onAddToCart($event)"
+          (inspectNft)="onInspectNft($event)"
+        />
+      } @empty {
+        <div class="surface-card text-center py-4">
+          No se encontraron coleccionables en la categoría {{ categoriaActiva() }}.
+        </div>
+      }
+    </div>
+  </section>
+}

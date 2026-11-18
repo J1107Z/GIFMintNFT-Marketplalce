@@ -1,0 +1,32 @@
+@use 'styles/variables' as *;
+
+.admin-subnav {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px;
+  background-color: #ffffff;
+  border: 1px solid $color-borde;
+  border-radius: 10px;
+
+  .subnav-link {
+    padding: 7px 14px;
+    border-radius: 7px;
+    font-size: to-rem(13px);
+    font-weight: 600;
+    color: $color-texto-secundario;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    &:hover {
+      background-color: $color-fondo;
+      color: $color-texto;
+    }
+
+    &.active {
+      background-color: $color-sidebar;
+      color: #ffffff;
+    }
+  }
+}

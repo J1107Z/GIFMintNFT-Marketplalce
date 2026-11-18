@@ -1,0 +1,84 @@
+@use 'sass:math';
+
+// ============================================================================
+// GIFMint Market — Design Tokens & SASS Utilities (Propuesta Gráfica)
+// ============================================================================
+
+// Paleta de colores fiel a docs/propuesta-grafica.png
+$color-sidebar: #0f172a;
+$color-sidebar-hover: #1e293b;
+$color-sidebar-texto: #94a3b8;
+$color-sidebar-texto-activo: #ffffff;
+
+$color-primario: #2563eb;
+$color-primario-hover: #1d4ed8;
+$color-primario-suave: #dbeafe;
+
+$color-mint: #0d9488;
+$color-mint-suave: #ccfbf1;
+
+$color-fondo: #f8fafc;
+$color-tarjeta: #ffffff;
+$color-borde: #e2e8f0;
+$color-texto: #0f172a;
+$color-texto-secundario: #475569;
+$color-texto-suave: #64748b;
+
+$color-exito: #16a34a;
+$color-exito-bg: #dcfce7;
+$color-alerta: #b45309;
+$color-alerta-bg: #fef3c7;
+$color-peligro: #dc2626;
+$color-peligro-bg: #fee2e2;
+$color-epico: #6d28d9;
+$color-epico-bg: #ede9fe;
+
+// Tipografía
+$fuente-principal: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+$fuente-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+// Espaciado y geometría
+$espacio-base: 8px;
+$ancho-sidebar: 256px;
+$alto-topbar: 68px;
+$radio-tarjeta: 12px;
+$radio-boton: 8px;
+$radio-pill: 999px;
+
+// Sombras
+$sombra-suave: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
+$sombra-elevada: 0 10px 25px -5px rgba(15, 23, 42, 0.1), 0 4px 10px -6px rgba(15, 23, 42, 0.05);
+
+// @function SASS (Clase 09): cálculo de escala espacial y conversión a rem
+@function space($multiplicador) {
+  @return $espacio-base * $multiplicador;
+}
+
+@function to-rem($px) {
+  @return math.div($px, 16px) * 1rem;
+}
+
+// @mixin SASS (Clase 09)
+@mixin flex-centro {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin flex-entre {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+@mixin tarjeta-superficie($padding: space(2)) {
+  background-color: $color-tarjeta;
+  border: 1px solid $color-borde;
+  border-radius: $radio-tarjeta;
+  box-shadow: $sombra-suave;
+  padding: $padding;
+}
+
+@mixin transicion-suave {
+  transition: all 0.18s ease-in-out;
+}

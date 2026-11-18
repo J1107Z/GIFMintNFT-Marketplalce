@@ -1,0 +1,207 @@
+<!-- Barra de navegación Atrás / Siguiente -->
+<section class="surface-card history-bar mb-4">
+  <div class="history-controls">
+    <a routerLink="/catalogo" class="btn-mint-outline">
+      <i class="bi bi-arrow-left"></i> Volver al catálogo
+    </a>
+    <button
+      type="button"
+      class="btn-mint-outline"
+      [disabled]="!history.puedeAtras()"
+      (click)="irAtrasHistorial()"
+    >
+      ← Anterior
+    </button>
+    <button
+      type="button"
+      class="btn-mint-outline"
+      [disabled]="!history.puedeAdelante()"
+      (click)="irAdelanteHistorial()"
+    >
+      Siguiente →
+    </button>
+  </div>
+
+  <div class="history-trail">
+    <span class="trail-label">Vistos recientemente:</span>
+    @for (item of history.historial(); track item.id) {
+      <a
+        [routerLink]="['/nft', item.id]"
+        class="trail-chip"
+        [class.current]="history.actual()?.id === item.id"
+      >
+        {{ item.edicion }}
+      </a>
+    }
+  </div>
+</section>
+
+@if (cargando()) {
+  <app-loader message="Cargando detalles del coleccionable..." />
+} @else if (nftActual(); as nft) {
+  <div class="detail-grid mb-5">
+    <div class="surface-card artwork-panel">
+      <div class="artwork-frame">
+        <img [src]="nft.gifUrl || nft.previewUrl" [alt]="nft.titulo" />
+      </div>
+      <div class="artwork-footer font-mono-nft">
+        <span><i class="bi bi-patch-check-fill text-primary"></i> Edición verificada</span>
+        <span>Serie #{{ bloqueActual() }}</span>
+      </div>
+    </div>
+
+    <div class="surface-card info-panel">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <span class="badge text-bg-light border">{{ nft.categoria }}</span>
+        <span class="font-mono-nft text-muted small">Edición {{ nft.edicion }}</span>
+      </div>
+
+      <h1 class="detail-title">{{ nft.titulo }}</h1>
+      <p class="detail-creator">
+        Creador verificado: <strong>{{ nft.creador }}</strong> · Popularidad ★ {{ nft.popularidad }}
+      </p>
+
+      <div class="price-box">
+        <div>
+          <div class="price-label">Precio de Colección</div>
+          <div class="price-main">${{ nft.precio }} USD</div>
+          <div class="price-eth font-mono-nft">{{ nft.precioEth }} ETH</div>
+        </div>
+        <span
+          class="rarity-badge"
+          [class]="
+            'rarity-' +
+            nft.rareza
+              .toLowerCase()
+              .normalize('NFD')
+              .replace(/[\u0300-\u036f]/g, '')
+          "
+        >
+          {{ nft.rareza }}
+        </span>
+      </div>
+
+      <div class="action-buttons">
+        <button type="button" class="btn-mint-primary flex-grow-1" (click)="cart.agregar(nft)">
+          <i class="bi bi-bag-plus"></i> Agregar al carrito
+        </button>
+        <button type="button" class="btn-mint-outline" (click)="cart.alternarFavorito(nft)">
+          <i
+            class="bi"
+            [class.bi-heart-fill]="cart.esFavorito(nft.id)"
+            [class.text-danger]="cart.esFavorito(nft.id)"
+            [class.bi-heart]="!cart.esFavorito(nft.id)"
+          ></i>
+          {{ cart.esFavorito(nft.id) ? 'Guardado' : 'Favorito' }}
+        </button>
+      </div>
+
+      <!-- Tabs con Query Params ?tab=resumen|propiedades|certificado -->
+      <div class="detail-tabs">
+        <a
+          [routerLink]="['/nft', nft.id]"
+          [queryParams]="{ tab: 'resumen' }"
+          class="tab-link"
+          [class.active]="tabActiva() === 'resumen'"
+        >
+          Resumen
+        </a>
+        <a
+          [routerLink]="['/nft', nft.id]"
+          [queryParams]="{ tab: 'propiedades' }"
+          class="tab-link"
+          [class.active]="tabActiva() === 'propiedades'"
+        >
+          Propiedades
+        </a>
+        <a
+          [routerLink]="['/nft', nft.id]"
+          [queryParams]="{ tab: 'certificado' }"
+          class="tab-link"
+          [class.active]="tabActiva() === 'certificado'"
+        >
+          Certificado Digital
+        </a>
+      </div>
+
+      <div class="tab-content-box">
+        @switch (tabActiva()) {
+          @case ('propiedades') {
+            <div class="props-grid">
+              <div class="prop-item">
+                <span>Categoría</span>
+                <strong>{{ nft.categoria }}</strong>
+              </div>
+              <div class="prop-item">
+                <span>Rareza</span>
+                <strong>{{ nft.rareza }}</strong>
+              </div>
+              <div class="prop-item">
+                <span>Edición</span>
+                <strong class="font-mono-nft">{{ nft.edicion }}</strong>
+              </div>
+              <div class="prop-item">
+                <span>Popularidad</span>
+                <strong>{{ nft.popularidad }} / 100</strong>
+              </div>
+            </div>
+          }
+          @case ('certificado') {
+            <div class="cert-list font-mono-nft">
+              <div><strong>Código de Autenticidad:</strong> {{ nft.tokenHash }}</div>
+              <div><strong>ID del Coleccionable:</strong> {{ nft.id }}</div>
+              <div><strong>Red:</strong> {{ nft.red }}</div>
+              <div><strong>Disponibilidad:</strong> Listo para entrega digital inmediata</div>
+            </div>
+          }
+          @default {
+            <p class="mb-0 text-secondary small">
+              Pieza digital animada de edición limitada. Compra verificada y registrada en tu
+              historial de órdenes con disponibilidad digital inmediata.
+            </p>
+          }
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Productos Relacionados (calculados mediante el Grafo interno de afinidad) -->
+  @if (productosRelacionados().length > 0) {
+    <section class="related-section">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+          <h2 class="h5 fw-bold mb-0">Productos Relacionados</h2>
+          <p class="text-muted small mb-0">
+            Coleccionables similares que podrían interesarte
+          </p>
+        </div>
+        <a
+          routerLink="/catalogo"
+          [queryParams]="{ cat: nft.categoria }"
+          class="btn-mint-outline btn-sm"
+        >
+          Ver más en {{ nft.categoria }}
+        </a>
+      </div>
+
+      <div class="nft-grid">
+        @for (rel of productosRelacionados(); track rel.id) {
+          <app-gif-card
+            [nft]="rel"
+            [isFavorite]="cart.esFavorito(rel.id)"
+            [inCart]="cart.estaEnCarrito(rel.id)"
+            (toggleFavorite)="onToggleFavorite($event)"
+            (addToCart)="onAddToCart($event)"
+            (inspectNft)="onInspectRelated($event)"
+          />
+        }
+      </div>
+    </section>
+  }
+} @else {
+  <div class="surface-card text-center py-5">
+    <h3>Coleccionable no encontrado</h3>
+    <p class="text-muted">El producto solicitado no está disponible en este momento.</p>
+    <a routerLink="/catalogo" class="btn-mint-primary">Ir al catálogo</a>
+  </div>
+}

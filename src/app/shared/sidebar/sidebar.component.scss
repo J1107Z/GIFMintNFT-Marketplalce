@@ -1,0 +1,159 @@
+@use 'styles/variables' as *;
+
+:host {
+  display: block;
+  height: 100%;
+}
+
+.sidebar-shell {
+  width: $ancho-sidebar;
+  height: 100%;
+  background-color: $color-sidebar;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  padding: space(2.5) space(2);
+
+  .brand-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 6px space(2.5);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    margin-bottom: space(2);
+
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, $color-primario, $color-mint);
+      @include flex-centro;
+      font-size: to-rem(18px);
+      color: #ffffff;
+      flex-shrink: 0;
+    }
+
+    .brand-info {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.15;
+
+      .brand-name {
+        font-size: to-rem(16px);
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+
+      .brand-tag {
+        font-size: to-rem(10.5px);
+        color: $color-sidebar-texto;
+      }
+    }
+  }
+
+  .sidebar-nav {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 2px;
+
+    ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+  }
+
+  .sidebar-footer {
+    margin-top: space(2);
+    padding-top: space(2);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+
+    .user-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 10px;
+      background-color: rgba(255, 255, 255, 0.05);
+
+      .avatar-dot {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        overflow: hidden;
+        background-color: $color-primario;
+        color: #ffffff;
+        font-weight: 700;
+        @include flex-centro;
+        flex-shrink: 0;
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
+
+      .user-meta {
+        flex: 1;
+        min-width: 0;
+
+        .user-name {
+          font-size: to-rem(13px);
+          font-weight: 700;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .user-role {
+          font-size: to-rem(11px);
+          color: $color-mint-suave;
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+        }
+      }
+
+      .logout-icon-btn {
+        border: none;
+        background: transparent;
+        color: $color-sidebar-texto;
+        cursor: pointer;
+        padding: 4px;
+        font-size: to-rem(16px);
+
+        &:hover {
+          color: #f87171;
+        }
+      }
+    }
+
+    .guest-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+
+      .guest-label {
+        font-size: to-rem(11.5px);
+        color: $color-sidebar-texto;
+        margin: 0;
+      }
+
+      .btn-auth-nav {
+        display: block;
+        text-align: center;
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-size: to-rem(13px);
+        font-weight: 600;
+        background-color: $color-primario;
+        color: #ffffff;
+
+        &.secondary {
+          background-color: rgba(255, 255, 255, 0.08);
+          color: #e2e8f0;
+        }
+      }
+    }
+  }
+}

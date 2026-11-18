@@ -1,0 +1,73 @@
+<article
+  class="nft-card"
+  [class.is-hovered]="hovered()"
+  (mouseenter)="onMouseEnter($event)"
+  (mouseleave)="onMouseLeave($event)"
+  (click)="onInspect()"
+>
+  <div class="nft-thumb-wrap">
+    <img [src]="nft.previewUrl || nft.gifUrl" [alt]="nft.titulo" loading="lazy" />
+
+    <button
+      type="button"
+      class="fav-btn"
+      [class.active]="isFavorite"
+      [title]="isFavorite ? 'Quitar de favoritos' : 'Guardar en favoritos'"
+      (click)="onToggleFavorite($event)"
+    >
+      <i class="bi" [class.bi-heart-fill]="isFavorite" [class.bi-heart]="!isFavorite"></i>
+    </button>
+
+    <span class="cat-tag">{{ nft.categoria }}</span>
+
+    @if (hovered()) {
+      <div class="hover-pill">
+        <i class="bi bi-eye"></i>
+        <span>Ver detalle</span>
+      </div>
+    }
+  </div>
+
+  <div class="nft-body">
+    <div class="meta-row">
+      @switch (nft.rareza) {
+        @case ('Legendario') {
+          <span class="rarity-badge rarity-legendario">Legendario</span>
+        }
+        @case ('Épico') {
+          <span class="rarity-badge rarity-epico">Épico</span>
+        }
+        @case ('Raro') {
+          <span class="rarity-badge rarity-raro">Raro</span>
+        }
+        @default {
+          <span class="rarity-badge rarity-comun">Común</span>
+        }
+      }
+      <span class="edition-tag font-mono-nft">{{ nft.edicion }}</span>
+    </div>
+
+    <h3 class="nft-title" [title]="nft.titulo">{{ nft.titulo }}</h3>
+
+    <div class="price-row">
+      <span class="price-usd">${{ nft.precio }} USD</span>
+      <span class="price-sep">/</span>
+      <span class="price-eth font-mono-nft">{{ nft.precioEth }} ETH</span>
+    </div>
+
+    <button
+      type="button"
+      class="cart-action-btn"
+      [class.added]="inCart"
+      (click)="onAddToCart($event)"
+    >
+      @if (inCart) {
+        <i class="bi bi-check2-circle"></i>
+        <span>En el carrito (+1)</span>
+      } @else {
+        <i class="bi bi-bag-plus"></i>
+        <span>Agregar al carrito</span>
+      }
+    </button>
+  </div>
+</article>

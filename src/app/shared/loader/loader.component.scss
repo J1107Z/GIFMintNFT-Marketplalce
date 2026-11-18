@@ -1,0 +1,16 @@
+@use 'styles/variables' as *;
+
+.loader-box {
+  @include tarjeta-superficie(space(5));
+  @include flex-centro;
+  flex-direction: column;
+  gap: space(2);
+  min-height: 220px;
+
+  .loader-text {
+    margin: 0;
+    font-size: to-rem(14px);
+    font-weight: 500;
+    color: $color-texto-suave;
+  }
+}

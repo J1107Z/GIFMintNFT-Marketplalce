@@ -1,0 +1,96 @@
+<!-- Métricas KPI -->
+<section class="kpi-grid mb-4">
+  <div class="surface-card kpi-card">
+    <div class="kpi-label">Ingresos Totales</div>
+    <div class="kpi-value">
+      {{ admin.ingresosTotales() | currency: 'USD' : 'symbol' : '1.0-0' }}
+    </div>
+    <div class="kpi-foot text-success">
+      <i class="bi bi-broadcast"></i> Actualización automática
+    </div>
+  </div>
+
+  <div class="surface-card kpi-card">
+    <div class="kpi-label">Órdenes Registradas</div>
+    <div class="kpi-value font-mono-nft">{{ admin.totalOrdenes() }}</div>
+    <div class="kpi-foot text-muted">
+      {{ admin.ordenesPendientes() }} órdenes en espera
+    </div>
+  </div>
+
+  <div class="surface-card kpi-card">
+    <div class="kpi-label">Ticket Promedio</div>
+    <div class="kpi-value">
+      {{ admin.ticketPromedio() | currency: 'USD' : 'symbol' : '1.0-0' }}
+    </div>
+    <div class="kpi-foot text-primary">Promedio por orden</div>
+  </div>
+</section>
+
+@if (admin.error(); as err) {
+  <div class="alert alert-danger py-2 px-3 small mb-3">{{ err }}</div>
+}
+
+<section class="surface-card">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h6 fw-bold mb-0">Ventas en tiempo real</h2>
+    <button
+      type="button"
+      class="btn-mint-outline btn-sm"
+      (click)="admin.cargarTodasLasVentas()"
+    >
+      <i class="bi bi-arrow-clockwise"></i> Refrescar
+    </button>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0 small">
+      <thead class="table-light">
+        <tr>
+          <th>ID</th>
+          <th>Comprador</th>
+          <th>Correo</th>
+          <th>Fecha</th>
+          <th>Ítems</th>
+          <th>Total USD</th>
+          <th>Estado</th>
+          <th>Cambiar Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (venta of admin.ventas(); track venta.id) {
+          <tr>
+            <td class="font-mono-nft fw-bold">#{{ venta.id }}</td>
+            <td class="fw-semibold">{{ venta.comprador_nombre || 'Coleccionista' }}</td>
+            <td class="text-muted">{{ venta.comprador_email }}</td>
+            <td>{{ venta.created_at | date: 'short' }}</td>
+            <td class="font-mono-nft">{{ venta.cantidad_items }}</td>
+            <td class="fw-bold font-mono-nft">${{ venta.total_usd }}</td>
+            <td>
+              <span class="status-pill" [class]="'status-' + venta.estado">
+                {{ venta.estado }}
+              </span>
+            </td>
+            <td>
+              <select
+                class="form-select form-select-sm"
+                [value]="venta.estado"
+                (change)="venta.id && cambiarEstado(venta.id, $event)"
+              >
+                <option value="pendiente">pendiente</option>
+                <option value="minteado">minteado</option>
+                <option value="completada">completada</option>
+              </select>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="8" class="text-center py-4 text-muted">
+              No existen ventas registradas todavía.
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>

@@ -1,0 +1,82 @@
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Chat de Comunidad</h1>
+    <p class="page-subtitle">Soporte y comunidad en tiempo real</p>
+  </div>
+  <span class="status-pill status-completada">
+    <i class="bi bi-broadcast"></i> En línea
+  </span>
+</div>
+
+@if (chat.error(); as err) {
+  <div class="alert alert-danger py-2 px-3 small mb-3">{{ err }}</div>
+}
+
+<section class="surface-card chat-shell">
+  <div class="messages-feed">
+    @for (msg of chat.mensajes(); track msg.id) {
+      <div
+        class="message-bubble"
+        [class.own-message]="msg.user_id === auth.usuario()?.id"
+      >
+        <div class="msg-header">
+          <div class="d-flex align-items-center gap-2">
+            <strong>{{ msg.autor_nombre }}</strong>
+            @if (msg.autor_rol === 'admin') {
+              <span class="badge text-bg-primary">Admin</span>
+            }
+            @if (msg.nft_referencia) {
+              <span class="badge text-bg-light border font-mono-nft">
+                NFT: {{ msg.nft_referencia }}
+              </span>
+            }
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <span class="msg-time font-mono-nft">{{ msg.created_at | date: 'shortTime' }}</span>
+            @if (msg.user_id === auth.usuario()?.id || auth.esAdmin()) {
+              <button
+                type="button"
+                class="btn btn-sm btn-link text-danger p-0"
+                title="Eliminar mensaje"
+                (click)="msg.id && chat.eliminarMensaje(msg.id)"
+              >
+                <i class="bi bi-trash"></i>
+              </button>
+            }
+          </div>
+        </div>
+        <p class="msg-body mb-0">{{ msg.contenido }}</p>
+      </div>
+    } @empty {
+      <div class="text-center py-5 text-muted small">
+        Aún no hay mensajes en la sala. ¡Sé el primero en comentar sobre un GIF-NFT!
+      </div>
+    }
+  </div>
+
+  <form class="chat-composer" (ngSubmit)="enviar()">
+    <div class="composer-inputs">
+      <select name="nftReferencia" class="form-select nft-select" [(ngModel)]="nftReferencia">
+        <option value="">Referenciar NFT (opcional)</option>
+        @for (nft of catalog.catalogo().slice(0, 12); track nft.id) {
+          <option [value]="nft.edicion + ' ' + nft.titulo">
+            {{ nft.edicion }} · {{ nft.titulo }}
+          </option>
+        }
+      </select>
+
+      <input
+        type="text"
+        name="nuevoMensaje"
+        class="form-control"
+        [(ngModel)]="nuevoMensaje"
+        placeholder="Escribe un mensaje..."
+        required
+      />
+
+      <button type="submit" class="btn-mint-primary" [disabled]="enviando()">
+        <i class="bi bi-send"></i> Enviar
+      </button>
+    </div>
+  </form>
+</section>

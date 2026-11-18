@@ -1,0 +1,72 @@
+@use 'styles/variables' as *;
+
+.chat-shell {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 210px);
+  min-height: 460px;
+
+  .messages-feed {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: space(2);
+
+    .message-bubble {
+      max-width: 78%;
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1px solid $color-borde;
+      background-color: $color-fondo;
+      align-self: flex-start;
+
+      &.own-message {
+        align-self: flex-end;
+        background-color: #eff6ff;
+        border-color: rgba($color-primario, 0.35);
+      }
+
+      .msg-header {
+        @include flex-entre;
+        gap: 12px;
+        font-size: to-rem(12px);
+        margin-bottom: 4px;
+
+        .msg-time {
+          color: $color-texto-suave;
+          font-size: to-rem(11px);
+        }
+      }
+
+      .msg-body {
+        font-size: to-rem(13.5px);
+        color: $color-texto;
+      }
+    }
+  }
+
+  .chat-composer {
+    border-top: 1px solid $color-borde;
+    padding-top: space(2);
+
+    .composer-inputs {
+      display: flex;
+      gap: 8px;
+
+      @media (max-width: 767.98px) {
+        flex-direction: column;
+      }
+
+      .nft-select {
+        max-width: 240px;
+
+        @media (max-width: 767.98px) {
+          max-width: 100%;
+        }
+      }
+    }
+  }
+}

@@ -1,59 +1,65 @@
-# ProyectoFinal
+   # GIFMint Market — E-Commerce de Coleccionables GIF-NFT
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.23.
+Plataforma web **E-Commerce de Coleccionables GIF-NFT** construida con **Angular 21**, **TypeScript**, **SASS**, **Bootstrap 5**, **D3.js**, **Axios**, **Supabase** (Auth, PostgreSQL, RLS, Realtime, Storage) y la **API de GIPHY** en tiempo real.
 
-## Development server
+Cada GIF obtenido desde GIPHY es enriquecido determinísticamente con atributos de coleccionable digital (`precio` en USD y ETH simbólico, `rareza`, `edición`, `categoría`, `popularidad` y `tokenHash`), permitiendo navegar, buscar con autocompletado inteligente, gestionar favoritos y carrito, procesar órdenes de minteo y operar un panel administrativo en tiempo real.
 
-To start a local development server, run:
+---
+
+## Integrantes
+
+- **Julian Andres Zapata Posada** — Código: **2240291**
+- **Yeick Jacson Moreno Ruiz** — Código: **2240991**
+
+---
+
+## Enlaces del Proyecto
+
+- **Propuesta Gráfica Definitiva:** [docs/propuesta-grafica.png](./docs/propuesta-grafica.png)
+- **Aplicación Publicada en Vercel:** `[Pegar enlace de despliegue en Vercel aquí]`
+
+![Propuesta Gráfica Definitiva — GIFMint Market](./docs/propuesta-grafica.png)
+
+---
+
+## Estructuras de Datos Implementadas
+
+| Estructura | Archivo | Uso Principal en la Plataforma |
+|---|---|---|
+| `LinkedList` | `src/app/data-structures/linked-list.ts` | Carrito de compras con recorrido de nodos en cadena |
+| `DoublyLinkedList` | `src/app/data-structures/doubly-linked-list.ts` | Historial Atrás / Siguiente de GIF-NFTs visitados (`/nft/:id`) |
+| `CircularLinkedList` | `src/app/data-structures/circular-linked-list.ts` | Carrusel infinito de drops destacados en Home (`/`) |
+| `Stack` (LIFO) | `src/app/data-structures/stack.ts` | Botón "Deshacer última acción" en Carrito (`/carrito`) |
+| `Queue` (FIFO) | `src/app/data-structures/queue.ts` | Cola de procesamiento y minteo de órdenes por llegada (`/cola-minteo`) |
+| `BinaryTree` (BST) + D3 | `src/app/data-structures/binary-tree.ts` | Explorador de precios con recorridos In/Pre/Post-Order y `d3.tree` (`/arbol-precios`) |
+| `NaryTree` | `src/app/data-structures/nary-tree.ts` | Sidebar jerárquico dinámico y árbol de categorías |
+| `Graph` + D3-Force | `src/app/data-structures/graph.ts` | Mapa interactivo de Hubs, Creadores y Colecciones (`/mapa-red`) |
+| `Trie` | `src/app/data-structures/trie.ts` | Autocompletado por prefijo en la barra de búsqueda |
+| `MinHeap` | `src/app/data-structures/min-heap.ts` | Ranking Top-K más populares en Home y autocompletado |
+
+---
+
+
+
+## Ejecución Local
 
 ```bash
+npm install
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Abre `http://localhost:4200/` en tu navegador.
 
-## Code scaffolding
+---
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Despliegue en Vercel
 
-```bash
-ng generate component component-name
-```
+El proyecto incluye [`vercel.json`](./vercel.json) con rewrites hacia `/index.html` para soportar rutas SPA de Angular Router sin errores 404 al recargar.
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+1. Sube el repositorio a GitHub con todas las ramas mezcladas sobre `main` (o `master`).
+2. En **Vercel**, selecciona **Add New Project → Import Git Repository**.
+3. Configura:
+   - **Framework Preset:** `Angular`
+   - **Build Command:** `npm run build`
+   - **Output Directory:** `dist/Proyecto-Final/browser`
+4. Haz clic en **Deploy** y actualiza el enlace de Vercel en la sección superior de este `README.md`.

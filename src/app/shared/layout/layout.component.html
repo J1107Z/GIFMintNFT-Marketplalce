@@ -1,0 +1,76 @@
+<div class="app-shell">
+  <div class="sidebar-desktop">
+    <app-sidebar />
+  </div>
+
+  @if (mobileMenuOpen()) {
+    <div class="mobile-backdrop" (click)="closeMobileMenu()"></div>
+    <div class="sidebar-mobile">
+      <app-sidebar (navigateClose)="closeMobileMenu()" />
+    </div>
+  }
+
+  <div class="main-column">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button
+          type="button"
+          class="mobile-toggle-btn"
+          aria-label="Abrir menú"
+          (click)="toggleMobileMenu()"
+        >
+          <i class="bi bi-list"></i>
+        </button>
+
+        <app-search-bar
+          (searchSubmitted)="onSearchSubmitted($event)"
+          (suggestionSelected)="onSuggestionSelected($event)"
+        />
+      </div>
+
+      <div class="topbar-actions">
+        <a routerLink="/carrito" class="icon-badge-btn" title="Carrito de compras">
+          <i class="bi bi-cart3"></i>
+          @if (cart.totalCantidad() > 0) {
+            <span class="counter-pill bg-cobalt font-mono-nft">{{ cart.totalCantidad() }}</span>
+          }
+        </a>
+
+        <a routerLink="/favoritos" class="icon-badge-btn" title="Favoritos">
+          <i class="bi bi-heart"></i>
+          @if (cart.totalFavoritos() > 0) {
+            <span class="counter-pill font-mono-nft">{{ cart.totalFavoritos() }}</span>
+          }
+        </a>
+
+        <a routerLink="/mis-ordenes" class="icon-badge-btn" title="Mis órdenes">
+          <i class="bi bi-receipt"></i>
+          @if (mintQueue.ordenesEnCola().length > 0) {
+            <span class="counter-pill bg-mint font-mono-nft">{{
+              mintQueue.ordenesEnCola().length
+            }}</span>
+          }
+        </a>
+
+        @if (auth.estaLogueado()) {
+          <a routerLink="/perfil" class="user-pill-top">
+            <span class="mini-avatar">
+              @if (auth.perfil()?.avatar_url) {
+                <img [src]="auth.perfil()?.avatar_url" alt="Perfil" />
+              } @else {
+                {{ inicialUsuario() }}
+              }
+            </span>
+            <span class="user-pill-name d-none d-md-inline">{{ auth.nombreVisible() }}</span>
+          </a>
+        } @else {
+          <a routerLink="/login" class="btn-mint-primary btn-sm">Ingresar</a>
+        }
+      </div>
+    </header>
+
+    <main class="workspace-content">
+      <router-outlet />
+    </main>
+  </div>
+</div>

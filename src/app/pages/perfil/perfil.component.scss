@@ -1,0 +1,47 @@
+@use 'styles/variables' as *;
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: space(3);
+
+  @media (max-width: 991.98px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.avatar-header {
+  display: flex;
+  align-items: center;
+  gap: space(2);
+
+  .avatar-preview {
+    width: 84px;
+    height: 84px;
+    border-radius: 50%;
+    overflow: hidden;
+    background-color: $color-sidebar;
+    color: #ffffff;
+    font-size: to-rem(28px);
+    font-weight: 800;
+    @include flex-centro;
+    flex-shrink: 0;
+    border: 3px solid $color-primario-suave;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+}
+
+.purchase-row {
+  @include flex-entre;
+  padding: 10px 0;
+  border-bottom: 1px solid $color-borde;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}

@@ -1,0 +1,146 @@
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Mi Carrito de Compras</h1>
+    <p class="page-subtitle">Revisa tus coleccionables antes de confirmar tu compra</p>
+  </div>
+
+  <button
+    type="button"
+    class="btn-mint-outline"
+    [disabled]="!cart.puedeDeshacer()"
+    (click)="cart.deshacerUltimaAccion()"
+  >
+    <i class="bi bi-arrow-counterclockwise"></i> Deshacer último cambio
+  </button>
+</div>
+
+@if (cart.ultimoMensaje()) {
+  <div class="alert alert-info py-2 px-3 small mb-3">
+    <i class="bi bi-info-circle me-1"></i> {{ cart.ultimoMensaje() }}
+  </div>
+}
+@if (mensajeCheckout()) {
+  <div class="alert alert-success py-2 px-3 small mb-3">{{ mensajeCheckout() }}</div>
+}
+@if (errorCheckout()) {
+  <div class="alert alert-danger py-2 px-3 small mb-3">{{ errorCheckout() }}</div>
+}
+
+<div class="cart-layout">
+  <div class="cart-left">
+    <div class="surface-card">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="h6 fw-bold mb-0">
+          Productos en tu carrito ({{ cart.items().length }})
+        </h2>
+        @if (cart.items().length > 0) {
+          <button
+            type="button"
+            class="btn btn-sm btn-link text-danger text-decoration-none p-0"
+            (click)="cart.vaciarCarrito(true)"
+          >
+            Vaciar carrito
+          </button>
+        }
+      </div>
+
+      @for (item of cart.items(); track item.nft.id) {
+        <div class="cart-item-row">
+          <img
+            [src]="item.nft.previewUrl || item.nft.gifUrl"
+            [alt]="item.nft.titulo"
+            class="cart-thumb"
+          />
+
+          <div class="cart-item-info">
+            <a [routerLink]="['/nft', item.nft.id]" class="item-title">{{ item.nft.titulo }}</a>
+            <div class="item-meta font-mono-nft">
+              {{ item.nft.edicion }} · {{ item.nft.rareza }} · ${{ item.nft.precio }} USD
+            </div>
+          </div>
+
+          <div class="qty-controls">
+            <button
+              type="button"
+              class="qty-btn"
+              (click)="cart.cambiarCantidad(item.nft.id, -1)"
+            >
+              -
+            </button>
+            <span class="qty-val font-mono-nft">{{ item.cantidad }}</span>
+            <button
+              type="button"
+              class="qty-btn"
+              (click)="cart.cambiarCantidad(item.nft.id, 1)"
+            >
+              +
+            </button>
+          </div>
+
+          <div class="item-subtotal font-mono-nft">
+            ${{ item.nft.precio * item.cantidad }}
+          </div>
+
+          <button
+            type="button"
+            class="remove-btn"
+            title="Eliminar del carrito"
+            (click)="cart.eliminar(item.nft.id)"
+          >
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+      } @empty {
+        <div class="text-center py-4">
+          <i class="bi bi-bag fs-2 text-muted d-block mb-2"></i>
+          <p class="text-muted small mb-3">Tu carrito está vacío.</p>
+          <a routerLink="/catalogo" class="btn-mint-primary">Explorar GIF-NFTs</a>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Resumen Checkout -->
+  <aside class="surface-card checkout-panel">
+    <h2 class="h5 fw-bold mb-3">Resumen de Orden</h2>
+
+    <div class="summary-line">
+      <span>Artículos seleccionados</span>
+      <strong class="font-mono-nft">{{ cart.totalCantidad() }}</strong>
+    </div>
+    <div class="summary-line">
+      <span>Entrega</span>
+      <strong>Digital inmediata</strong>
+    </div>
+    <div class="summary-line">
+      <span>Total Estimado ETH</span>
+      <strong class="font-mono-nft text-teal">{{ cart.totalEth() }} ETH</strong>
+    </div>
+
+    <hr />
+
+    <div class="summary-total">
+      <span>Total USD</span>
+      <span class="total-amount">${{ cart.totalUsd() }} USD</span>
+    </div>
+
+    <button
+      type="button"
+      class="btn-mint-primary w-100 mt-3"
+      [disabled]="cart.items().length === 0 || mintQueue.procesando()"
+      (click)="finalizarCompra()"
+    >
+      @if (mintQueue.procesando()) {
+        <span class="spinner-border spinner-border-sm"></span>
+        <span>Procesando compra...</span>
+      } @else {
+        <i class="bi bi-check2-circle"></i>
+        <span>Finalizar compra</span>
+      }
+    </button>
+
+    <p class="text-muted small mt-3 mb-0">
+      Al confirmar, procesaremos tu orden y la verás reflejada en Mis Órdenes.
+    </p>
+  </aside>
+</div>

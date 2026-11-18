@@ -1,0 +1,30 @@
+@use 'styles/variables' as *;
+
+.queue-item {
+  @include flex-entre;
+  gap: space(1.5);
+  padding: 12px;
+  border: 1px solid $color-borde;
+  border-radius: 10px;
+  margin-bottom: 8px;
+
+  &.front-node {
+    border-color: rgba($color-mint, 0.45);
+    background-color: rgba($color-mint, 0.05);
+  }
+
+  .queue-pos {
+    padding: 4px 10px;
+    border-radius: 6px;
+    background-color: $color-sidebar;
+    color: #ffffff;
+    font-size: to-rem(11px);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .queue-info {
+    flex: 1;
+    min-width: 0;
+  }
+}

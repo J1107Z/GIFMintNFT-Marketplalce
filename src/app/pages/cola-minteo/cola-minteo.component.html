@@ -1,0 +1,110 @@
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Mis Órdenes y Compras</h1>
+    <p class="page-subtitle">Seguimiento de tus órdenes activas e historial de compras</p>
+  </div>
+
+  @if (mintQueue.ordenesEnCola().length > 0) {
+    <button
+      type="button"
+      class="btn-mint-primary"
+      (click)="mintQueue.desencolarFrente()"
+    >
+      <i class="bi bi-check2-circle"></i> Confirmar / Procesar siguiente
+    </button>
+  }
+</div>
+
+@if (mintQueue.mensajeCola()) {
+  <div class="alert alert-info py-2 px-3 small mb-3">{{ mintQueue.mensajeCola() }}</div>
+}
+
+<!-- Órdenes en procesamiento (respaldadas internamente por la Queue FIFO) -->
+<section class="surface-card mb-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h6 fw-bold mb-0">
+      Órdenes en Proceso ({{ mintQueue.ordenesEnCola().length }})
+    </h2>
+    <span class="small text-muted">Orden de llegada</span>
+  </div>
+
+  @for (orden of mintQueue.ordenesEnCola(); track orden.orderId; let first = $first; let idx = $index) {
+    <div class="queue-item" [class.front-node]="first">
+      <div class="queue-pos font-mono-nft">
+        {{ first ? 'EN CURSO #1' : '#' + (idx + 1) }}
+      </div>
+      <div class="queue-info">
+        <div class="fw-bold small">
+          {{ orden.orderId }} — {{ orden.compradorNombre }}
+        </div>
+        <div class="text-muted font-mono-nft small">
+          Fecha: {{ orden.arrivalDate | date: 'short' }} · {{ orden.items.length }} artículo(s)
+        </div>
+      </div>
+      <div class="text-end">
+        <div class="fw-bold font-mono-nft">${{ orden.totalUsd }} USD</div>
+        <span class="status-pill" [class]="'status-' + orden.estado">{{ orden.estado }}</span>
+      </div>
+    </div>
+  } @empty {
+    <div class="text-center py-4 text-muted small">
+      No tienes órdenes en proceso en este momento.
+      <div class="mt-2">
+        <a routerLink="/catalogo" class="btn-mint-outline btn-sm">Explorar catálogo</a>
+      </div>
+    </div>
+  }
+</section>
+
+<!-- Historial de compras del usuario -->
+<section class="surface-card">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h6 fw-bold mb-0">Historial de Compras</h2>
+    <button
+      type="button"
+      class="btn-mint-outline btn-sm"
+      (click)="mintQueue.cargarMisCompras()"
+    >
+      <i class="bi bi-arrow-clockwise"></i> Actualizar
+    </button>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0 small">
+      <thead class="table-light">
+        <tr>
+          <th># Orden</th>
+          <th>Fecha</th>
+          <th>Ítems</th>
+          <th>Total USD</th>
+          <th>Total ETH</th>
+          <th>Referencia</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (venta of mintQueue.historialCompras(); track venta.id) {
+          <tr>
+            <td class="font-mono-nft fw-bold">#{{ venta.id }}</td>
+            <td>{{ venta.created_at | date: 'short' }}</td>
+            <td>{{ venta.cantidad_items }}</td>
+            <td class="fw-bold">${{ venta.total_usd }}</td>
+            <td class="font-mono-nft text-muted">{{ venta.total_eth }} ETH</td>
+            <td class="font-mono-nft text-muted">{{ venta.hash_transaccion }}</td>
+            <td>
+              <span class="status-pill" [class]="'status-' + venta.estado">
+                {{ venta.estado }}
+              </span>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="7" class="text-center py-4 text-muted">
+              Aún no tienes compras registradas.
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>
