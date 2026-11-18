@@ -50,16 +50,3 @@ ng serve
 
 Abre `http://localhost:4200/` en tu navegador.
 
----
-
-## Despliegue en Vercel
-
-El proyecto incluye [`vercel.json`](./vercel.json) con rewrites hacia `/index.html` para soportar rutas SPA de Angular Router sin errores 404 al recargar.
-
-1. Sube el repositorio a GitHub con todas las ramas mezcladas sobre `main` (o `master`).
-2. En **Vercel**, selecciona **Add New Project → Import Git Repository**.
-3. Configura:
-   - **Framework Preset:** `Angular`
-   - **Build Command:** `npm run build`
-   - **Output Directory:** `dist/Proyecto-Final/browser`
-4. Haz clic en **Deploy** y actualiza el enlace de Vercel en la sección superior de este `README.md`.
