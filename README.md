@@ -16,7 +16,7 @@ Cada GIF obtenido desde GIPHY es enriquecido determinísticamente con atributos 
 ## Enlaces del Proyecto
 
 - **Propuesta Gráfica Definitiva:** [docs/propuesta-grafica.png](./docs/propuesta-grafica.png)
-- **Aplicación Publicada en Vercel:** `[Pegar enlace de despliegue en Vercel aquí]`
+- **Aplicación Publicada en Vercel:** [https://gifmint-nft-marketplace.vercel.app](https://gifmint-nft-marketplace.vercel.app)
 
 ![Propuesta Gráfica Definitiva — GIFMint Market](./docs/propuesta-grafica.png)
 
