@@ -39,7 +39,16 @@ Cada GIF obtenido desde GIPHY es enriquecido determinísticamente con atributos 
 
 ---
 
+## Credenciales de Acceso Admin (Evaluación)
 
+Para validar el panel de administración (`/admin/ventas` y `/admin/usuarios` en el menú **Administración** del sidebar), inicia sesión en `/login` con:
+
+- **Correo:** `admin@gifmint.com`
+- **Contraseña:** `GifMintAdmin2026!`
+
+*(Cualquier cuenta nueva creada desde `/registro` ingresa automáticamente con rol `cliente`).*
+
+---
 
 ## Ejecución Local
 
