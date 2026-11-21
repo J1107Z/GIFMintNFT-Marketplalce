@@ -1,3 +1,4 @@
+@use 'sass:list';
 @use 'styles/variables' as *;
 
 * {
@@ -50,7 +51,14 @@ a {
   }
 }
 
-// Badges de Rareza fieles a propuesta gráfica
+// Badges de Rareza fieles a propuesta gráfica (generados con mapa + ciclo @each SASS de Clase 09)
+$rarity-themes: (
+  comun: (#f1f5f9, #475569),
+  raro: ($color-primario-suave, $color-primario-hover),
+  epico: ($color-epico-bg, $color-epico),
+  legendario: ($color-alerta-bg, $color-alerta),
+);
+
 .rarity-badge {
   display: inline-flex;
   align-items: center;
@@ -61,28 +69,21 @@ a {
   font-weight: 700;
   letter-spacing: 0.01em;
 
-  &.rarity-comun {
-    background-color: #f1f5f9;
-    color: #475569;
-  }
-
-  &.rarity-raro {
-    background-color: $color-primario-suave;
-    color: $color-primario-hover;
-  }
-
-  &.rarity-epico {
-    background-color: $color-epico-bg;
-    color: $color-epico;
-  }
-
-  &.rarity-legendario {
-    background-color: $color-alerta-bg;
-    color: $color-alerta;
+  @each $clave, $colores in $rarity-themes {
+    &.rarity-#{$clave} {
+      background-color: list.nth($colores, 1);
+      color: list.nth($colores, 2);
+    }
   }
 }
 
-// Badges de estado de ventas/órdenes
+// Badges de estado de ventas/órdenes (ciclo @each SASS)
+$status-themes: (
+  pendiente: ($color-alerta-bg, $color-alerta),
+  minteado: ($color-primario-suave, $color-primario-hover),
+  completada: ($color-exito-bg, $color-exito),
+);
+
 .status-pill {
   display: inline-flex;
   align-items: center;
@@ -93,19 +94,11 @@ a {
   font-weight: 600;
   text-transform: capitalize;
 
-  &.status-pendiente {
-    background-color: $color-alerta-bg;
-    color: $color-alerta;
-  }
-
-  &.status-minteado {
-    background-color: $color-primario-suave;
-    color: $color-primario-hover;
-  }
-
-  &.status-completada {
-    background-color: $color-exito-bg;
-    color: $color-exito;
+  @each $estado, $colores in $status-themes {
+    &.status-#{$estado} {
+      background-color: list.nth($colores, 1);
+      color: list.nth($colores, 2);
+    }
   }
 }
 

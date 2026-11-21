@@ -341,21 +341,23 @@ export class GiphyService {
     }
   }
 
-  // Obtener detalle individual por ID (/v1/gifs/:id)
+  // Estrategia 3 activa (Clase 13): Obtener detalle individual por ID via Angular HttpClient + interceptores
   async obtenerPorId(id: string): Promise<GifNft | null> {
     const cleanId = id.trim();
     if (!cleanId) return null;
 
-    const controller = new AbortController();
+    this.metodoActual.set('httpclient');
+    const inicio = performance.now();
+
     try {
-      const params = new URLSearchParams({ api_key: this.apiKey });
-      const res = await fetch(`${this.baseUrl}/${encodeURIComponent(cleanId)}?${params}`, {
-        signal: AbortSignal.any([controller.signal, AbortSignal.timeout(8000)]),
-      });
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}`);
-      }
-      const json: GiphySingleResponse = await res.json();
+      const params = new HttpParams().set('api_key', this.apiKey);
+      const json = await firstValueFrom(
+        this.http.get<GiphySingleResponse>(
+          `${this.baseUrl}/${encodeURIComponent(cleanId)}`,
+          { params }
+        )
+      );
+      this.tiempoRespuestaMs.set(Math.round(performance.now() - inicio));
       return enrichGifToNft(json.data);
     } catch (err) {
       console.warn('[GiphyService] Error obteniendo GIF por ID:', err);

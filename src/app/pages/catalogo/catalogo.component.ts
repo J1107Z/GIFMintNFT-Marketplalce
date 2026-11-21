@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit, computed, effect, inject, input, signal }
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CartService } from '../../core/services/cart.service';
+import { ApiStrategy } from '../../core/services/giphy.service';
 import { MarketCatalogService } from '../../core/services/market-catalog.service';
 import { useGiphy } from '../../hooks/use-giphy';
 import {
@@ -153,7 +154,7 @@ export class CatalogoComponent implements OnInit, OnDestroy {
     }, 400);
   }
 
-  async ejecutarBusqueda(query?: string): Promise<void> {
+  async ejecutarBusqueda(query?: string, metodo: ApiStrategy = 'fetch'): Promise<void> {
     const q = (query ?? this.terminoBusqueda()).trim();
     if (!q) {
       this.solicitudActualId++;
@@ -165,7 +166,7 @@ export class CatalogoComponent implements OnInit, OnDestroy {
     const solicitudId = ++this.solicitudActualId;
     const cat =
       this.categoriaFiltro() === 'Todas' ? undefined : (this.categoriaFiltro() as GifCategory);
-    const items = await this.giphyHook.buscar(q, 'fetch', cat);
+    const items = await this.giphyHook.buscar(q, metodo, cat);
 
     if (solicitudId !== this.solicitudActualId || this.terminoBusqueda().trim() !== q) {
       return;
@@ -183,7 +184,8 @@ export class CatalogoComponent implements OnInit, OnDestroy {
     this.ultimoQueryDeUrl = query;
     this.ultimaCatDeUrl = this.categoriaFiltro();
     this.sincronizarUrl(query, true);
-    void this.ejecutarBusqueda(query);
+    // Usa la instancia dedicada Axios (axios.create + interceptores) para tendencias rápidas
+    void this.ejecutarBusqueda(query, 'axios');
   }
 
   onBuscarSubmit(): void {

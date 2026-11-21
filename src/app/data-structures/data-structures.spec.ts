@@ -1,8 +1,11 @@
 import { signal } from '@angular/core';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { vi } from 'vitest';
+import { authInterceptor } from '../core/interceptors/auth.interceptor';
+import { errorInterceptor } from '../core/interceptors/error.interceptor';
 import { BinaryTree } from './binary-tree';
 import { CircularLinkedList } from './circular-linked-list';
 import { DoublyLinkedList } from './doubly-linked-list';
@@ -593,5 +596,45 @@ describe('Estructuras de Datos y Modelo GIF-NFT', () => {
     } finally {
       vi.useRealTimers();
     }
+  });
+
+  it('GiphyService.obtenerPorId usa Angular HttpClient con interceptores funcionales', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideHttpClient(withInterceptors([authInterceptor, errorInterceptor])),
+        provideHttpClientTesting(),
+        GiphyService,
+      ],
+    });
+
+    const giphy = TestBed.inject(GiphyService);
+    const httpMock = TestBed.inject(HttpTestingController);
+
+    const promesa = giphy.obtenerPorId('nft-http-42');
+    const req = httpMock.expectOne((r) => r.url.endsWith('/nft-http-42') && r.params.has('api_key'));
+    expect(req.request.method).toBe('GET');
+
+    req.flush({
+      data: {
+        id: 'nft-http-42',
+        title: 'Cyberpunk Hologram GIF',
+        slug: 'cyberpunk-hologram-nft-http-42',
+        username: 'neonstudio',
+        url: 'https://giphy.com/nft-http-42',
+        images: {
+          fixed_height: { url: 'https://media.giphy.com/nft-http-42-sm.gif' },
+          original: { url: 'https://media.giphy.com/nft-http-42.gif' },
+        },
+      },
+      meta: { status: 200, msg: 'OK' },
+    });
+
+    const nft = await promesa;
+    httpMock.verify();
+
+    expect(nft).not.toBeNull();
+    expect(nft?.id).toBe('nft-http-42');
+    expect(nft?.categoria).toBe('Cyberpunk');
+    expect(giphy.metodoActual()).toBe('httpclient');
   });
 });
