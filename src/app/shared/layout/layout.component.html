@@ -24,6 +24,7 @@
 
         <app-search-bar
           (searchSubmitted)="onSearchSubmitted($event)"
+          (searchCleared)="onSearchCleared()"
           (suggestionSelected)="onSuggestionSelected($event)"
         />
       </div>

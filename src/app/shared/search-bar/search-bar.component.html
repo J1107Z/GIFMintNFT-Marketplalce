@@ -2,6 +2,7 @@
   <form class="search-form" (ngSubmit)="onSubmit()">
     <i class="bi bi-search search-icon"></i>
     <input
+      #searchInput
       type="text"
       name="searchQuery"
       class="search-input"
@@ -13,8 +14,16 @@
       (input)="onInput($event)"
       (keydown)="onKeydown($event)"
     />
-    @if (termino.trim().length > 0) {
-      <button type="submit" class="search-go-btn">Buscar</button>
+    @if (termino.length > 0) {
+      <button
+        type="button"
+        class="search-clear-btn"
+        aria-label="Limpiar búsqueda"
+        (mousedown)="$event.preventDefault()"
+        (click)="limpiar()"
+      >
+        ×
+      </button>
     }
   </form>
 

@@ -29,7 +29,23 @@ export class LayoutComponent implements OnInit {
   }
 
   onSearchSubmitted(query: string): void {
-    this.router.navigate(['/catalogo'], { queryParams: { q: query } });
+    const enCatalogo = this.router.url.split('?')[0] === '/catalogo';
+    void this.router.navigate(['/catalogo'], {
+      queryParams: { q: query },
+      queryParamsHandling: enCatalogo ? 'merge' : undefined,
+      replaceUrl: enCatalogo,
+    });
+  }
+
+  onSearchCleared(): void {
+    if (this.router.url.split('?')[0] !== '/catalogo') {
+      return;
+    }
+    void this.router.navigate(['/catalogo'], {
+      queryParams: { q: null },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
   }
 
   onSuggestionSelected(entry: TrieEntry<GifNft>): void {

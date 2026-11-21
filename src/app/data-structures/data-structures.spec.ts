@@ -1,6 +1,7 @@
 import { signal } from '@angular/core';
 import { provideHttpClient } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
+import { provideRouter, Router } from '@angular/router';
 import { vi } from 'vitest';
 import { BinaryTree } from './binary-tree';
 import { CircularLinkedList } from './circular-linked-list';
@@ -25,6 +26,8 @@ import { AuthService } from '../core/services/auth.service';
 import { CartService } from '../core/services/cart.service';
 import { GiphyService } from '../core/services/giphy.service';
 import { MarketCatalogService } from '../core/services/market-catalog.service';
+import { CatalogoComponent } from '../pages/catalogo/catalogo.component';
+import { SearchBarComponent } from '../shared/search-bar/search-bar.component';
 
 describe('Estructuras de Datos y Modelo GIF-NFT', () => {
   it('LinkedList: append, peek, remove y toArray', () => {
@@ -412,6 +415,183 @@ describe('Estructuras de Datos y Modelo GIF-NFT', () => {
       }
     } finally {
       fetchSpy.mockRestore();
+    }
+  });
+
+  it('CatalogoComponent: búsqueda en vivo con debounce 400ms, sin botón Buscar y restauración al borrar', async () => {
+    vi.useFakeTimers();
+    const cancelarSpy = vi.fn();
+    const sampleCyber = enrichGifToNft(
+      {
+        id: 'cyb-1',
+        title: 'Cyberpunk Neon City',
+        url: 'https://giphy.com/cyb-1',
+        images: {
+          fixed_height: { url: 'https://media.giphy.com/cyb-1-sm.gif' },
+          original: { url: 'https://media.giphy.com/cyb-1.gif' },
+        },
+      },
+      'Cyberpunk'
+    );
+    const buscarEnVivoSpy = vi.fn().mockResolvedValue([sampleCyber]);
+
+    try {
+      await TestBed.configureTestingModule({
+        imports: [CatalogoComponent],
+        providers: [
+          provideRouter([]),
+          {
+            provide: MarketCatalogService,
+            useValue: {
+              catalogo: signal([sampleCyber]),
+              cargandoInicial: signal(false),
+              inicializarCatalogo: vi.fn().mockResolvedValue(undefined),
+              ordenarPorPrecioConBST: (items: GifNft[]) => items,
+              buscarEnVivo: buscarEnVivoSpy,
+              autocompletar: vi.fn().mockReturnValue([]),
+            },
+          },
+          {
+            provide: GiphyService,
+            useValue: {
+              cargando: signal(false),
+              error: signal(null),
+              metodoActual: signal('fetch'),
+              tiempoRespuestaMs: signal(null),
+              cancelarPeticionEnCurso: cancelarSpy,
+            },
+          },
+          {
+            provide: CartService,
+            useValue: {
+              esFavorito: () => false,
+              estaEnCarrito: () => false,
+              alternarFavorito: vi.fn(),
+              agregar: vi.fn(),
+            },
+          },
+        ],
+      }).compileComponents();
+
+      const fixture = TestBed.createComponent(CatalogoComponent);
+      const comp = fixture.componentInstance;
+      const router = TestBed.inject(Router);
+      const navSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+
+      fixture.detectChanges();
+
+      // Verifica que no existe botón submit "Buscar"
+      const submitBtn = fixture.nativeElement.querySelector('button[type="submit"]');
+      expect(submitBtn).toBeNull();
+
+      // Simula escritura progresiva rápida
+      comp.alEscribir({ target: { value: 'cy' } } as unknown as Event);
+      vi.advanceTimersByTime(200);
+      comp.alEscribir({ target: { value: 'cyberpunk' } } as unknown as Event);
+      expect(comp.terminoBusqueda()).toBe('cyberpunk');
+      expect(buscarEnVivoSpy).not.toHaveBeenCalled();
+
+      // Al completar los 400ms dispara exactamente una búsqueda y sincroniza URL con replaceUrl: true
+      await vi.advanceTimersByTimeAsync(400);
+      expect(buscarEnVivoSpy).toHaveBeenCalledTimes(1);
+      expect(buscarEnVivoSpy).toHaveBeenCalledWith('cyberpunk', 'fetch', undefined);
+      expect(navSpy).toHaveBeenCalledWith(['/catalogo'], {
+        queryParams: { q: 'cyberpunk', cat: null },
+        replaceUrl: true,
+      });
+
+      // Borrar texto manteniendo categoría restaura catálogo inicial y cancela petición en curso
+      comp.categoriaFiltro.set('Cyberpunk');
+      comp.alEscribir({ target: { value: '' } } as unknown as Event);
+      await vi.advanceTimersByTimeAsync(400);
+      expect(cancelarSpy).toHaveBeenCalled();
+      expect(comp.resultadosBusqueda()).toBeNull();
+      expect(comp.categoriaFiltro()).toBe('Cyberpunk');
+      expect(navSpy).toHaveBeenLastCalledWith(['/catalogo'], {
+        queryParams: { q: null, cat: 'Cyberpunk' },
+        replaceUrl: true,
+      });
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('SearchBarComponent: Trie instantáneo, debounce 450ms y cancelación al elegir sugerencia o limpiar', async () => {
+    vi.useFakeTimers();
+    const nft = enrichGifToNft(
+      {
+        id: 'tri-1',
+        title: 'Cyberpunk Cat',
+        url: 'https://giphy.com/tri-1',
+        images: {
+          fixed_height: { url: 'https://media.giphy.com/tri-1-sm.gif' },
+          original: { url: 'https://media.giphy.com/tri-1.gif' },
+        },
+      },
+      'Cyberpunk'
+    );
+    const trieEntry = { name: 'Cyberpunk Cat', popularity: 95, payload: nft };
+
+    try {
+      await TestBed.configureTestingModule({
+        imports: [SearchBarComponent],
+        providers: [
+          {
+            provide: MarketCatalogService,
+            useValue: {
+              catalogo: signal([nft]),
+              cargandoInicial: signal(false),
+              autocompletar: vi.fn().mockReturnValue([trieEntry]),
+            },
+          },
+          {
+            provide: GiphyService,
+            useValue: {
+              cargando: signal(false),
+              error: signal(null),
+              metodoActual: signal('fetch'),
+              tiempoRespuestaMs: signal(null),
+              cancelarPeticionEnCurso: vi.fn(),
+            },
+          },
+        ],
+      }).compileComponents();
+
+      const fixture = TestBed.createComponent(SearchBarComponent);
+      const comp = fixture.componentInstance;
+      const submitted: string[] = [];
+      const selected: string[] = [];
+      let clearedCount = 0;
+
+      comp.searchSubmitted.subscribe((v) => submitted.push(v));
+      comp.suggestionSelected.subscribe((e) => selected.push(e.name));
+      comp.searchCleared.subscribe(() => clearedCount++);
+      fixture.detectChanges();
+
+      expect(fixture.nativeElement.querySelector('.search-go-btn')).toBeNull();
+
+      // Al escribir carga sugerencias Trie inmediatamente y emite búsqueda a los 450ms
+      comp.onInput({ target: { value: 'cyber' } } as unknown as Event);
+      expect(comp.sugerencias().length).toBe(1);
+      expect(submitted).toEqual([]);
+
+      await vi.advanceTimersByTimeAsync(450);
+      expect(submitted).toEqual(['cyber']);
+
+      // Al elegir sugerencia del Trie cancela el debounce pendiente
+      comp.onInput({ target: { value: 'cyber cat' } } as unknown as Event);
+      comp.elegirSugerencia(trieEntry);
+      await vi.advanceTimersByTimeAsync(500);
+      expect(selected).toEqual(['Cyberpunk Cat']);
+      expect(submitted).toEqual(['cyber']);
+
+      // Limpiar resetea texto, sugerencias y emite searchCleared
+      comp.limpiar();
+      expect(comp.termino).toBe('');
+      expect(comp.sugerencias().length).toBe(0);
+      expect(clearedCount).toBe(1);
+    } finally {
+      vi.useRealTimers();
     }
   });
 });

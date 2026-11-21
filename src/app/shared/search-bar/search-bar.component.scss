@@ -48,18 +48,25 @@
     }
   }
 
-  .search-go-btn {
+  .search-clear-btn {
     border: none;
-    background-color: $color-primario;
-    color: #ffffff;
-    border-radius: 7px;
-    padding: 6px 14px;
-    font-size: to-rem(12.5px);
-    font-weight: 600;
+    background-color: #e2e8f0;
+    color: $color-texto-secundario;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: to-rem(15px);
+    line-height: 1;
     cursor: pointer;
+    flex-shrink: 0;
+    @include transicion-suave;
 
     &:hover {
-      background-color: $color-primario-hover;
+      background-color: #cbd5e1;
+      color: $color-texto;
     }
   }
 

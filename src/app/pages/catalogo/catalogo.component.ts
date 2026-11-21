@@ -36,11 +36,16 @@ export class CatalogoComponent implements OnInit, OnDestroy {
   readonly rarezas = GIF_RARITIES;
   readonly sugerenciasRapidas = ['cyberpunk', 'anime', 'pixel game', '3d loop', 'meme cat', 'smile'];
 
-  terminoBusqueda = '';
+  readonly terminoBusqueda = signal<string>('');
   readonly categoriaFiltro = signal<GifCategory | 'Todas'>('Todas');
   readonly rarezaFiltro = signal<GifRarity | 'Todas'>('Todas');
   readonly ordenSeleccionado = signal<SortOption>('relevancia');
   readonly resultadosBusqueda = signal<GifNft[] | null>(null);
+
+  private temporizador?: ReturnType<typeof setTimeout>;
+  private solicitudActualId = 0;
+  private ultimoQueryDeUrl = '';
+  private ultimaCatDeUrl: GifCategory | 'Todas' = 'Todas';
 
   readonly listaVisible = computed<GifNft[]>(() => {
     const base = this.resultadosBusqueda() ?? this.catalog.catalogo();
@@ -71,17 +76,28 @@ export class CatalogoComponent implements OnInit, OnDestroy {
     effect(() => {
       const query = (this.q() ?? '').trim();
       const catParam = (this.cat() ?? '').trim();
+      const nextCat: GifCategory | 'Todas' =
+        catParam && GIF_CATEGORIES.includes(catParam as GifCategory)
+          ? (catParam as GifCategory)
+          : 'Todas';
 
-      if (catParam && GIF_CATEGORIES.includes(catParam as GifCategory)) {
-        this.categoriaFiltro.set(catParam as GifCategory);
-      } else if (!catParam) {
-        this.categoriaFiltro.set('Todas');
+      this.categoriaFiltro.set(nextCat);
+
+      if (query === this.ultimoQueryDeUrl && nextCat === this.ultimaCatDeUrl) {
+        return;
       }
 
+      this.ultimoQueryDeUrl = query;
+      this.ultimaCatDeUrl = nextCat;
+
       if (query) {
-        this.terminoBusqueda = query;
+        this.terminoBusqueda.set(query);
         void this.ejecutarBusqueda(query);
       } else {
+        this.cancelarTemporizador();
+        this.solicitudActualId++;
+        this.giphyHook.cancelar();
+        this.terminoBusqueda.set('');
         this.resultadosBusqueda.set(null);
       }
     });
@@ -92,47 +108,136 @@ export class CatalogoComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.cancelarTemporizador();
+    this.solicitudActualId++;
     this.giphyHook.cancelar();
   }
 
+  private cancelarTemporizador(): void {
+    if (this.temporizador) {
+      clearTimeout(this.temporizador);
+      this.temporizador = undefined;
+    }
+  }
+
+  private sincronizarUrl(query: string, replaceUrl: boolean): void {
+    const queryParams: Record<string, string | null> = {
+      q: query ? query : null,
+      cat: this.categoriaFiltro() !== 'Todas' ? this.categoriaFiltro() : null,
+    };
+    void this.router.navigate(['/catalogo'], { queryParams, replaceUrl });
+  }
+
+  // Clase 13 (13-API): Búsqueda en vivo al escribir con debounce de 400 ms y cancelación AbortController
+  alEscribir(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const valor = input.value;
+    this.terminoBusqueda.set(valor);
+
+    this.cancelarTemporizador();
+
+    this.temporizador = setTimeout(() => {
+      const query = valor.trim();
+      this.ultimoQueryDeUrl = query;
+      this.ultimaCatDeUrl = this.categoriaFiltro();
+
+      if (query.length > 0) {
+        this.sincronizarUrl(query, true);
+        void this.ejecutarBusqueda(query);
+      } else {
+        this.solicitudActualId++;
+        this.giphyHook.cancelar();
+        this.resultadosBusqueda.set(null);
+        this.sincronizarUrl('', true);
+      }
+    }, 400);
+  }
+
   async ejecutarBusqueda(query?: string): Promise<void> {
-    const q = (query ?? this.terminoBusqueda).trim();
+    const q = (query ?? this.terminoBusqueda()).trim();
     if (!q) {
+      this.solicitudActualId++;
+      this.giphyHook.cancelar();
       this.resultadosBusqueda.set(null);
       return;
     }
 
+    const solicitudId = ++this.solicitudActualId;
     const cat =
       this.categoriaFiltro() === 'Todas' ? undefined : (this.categoriaFiltro() as GifCategory);
     const items = await this.giphyHook.buscar(q, 'fetch', cat);
+
+    if (solicitudId !== this.solicitudActualId || this.terminoBusqueda().trim() !== q) {
+      return;
+    }
+
     this.resultadosBusqueda.set(items);
   }
 
+  buscarSugerencia(sugerencia: string): void {
+    this.terminoBusqueda.set(sugerencia);
+    this.cancelarTemporizador();
+    const query = sugerencia.trim();
+    if (!query) return;
+
+    this.ultimoQueryDeUrl = query;
+    this.ultimaCatDeUrl = this.categoriaFiltro();
+    this.sincronizarUrl(query, true);
+    void this.ejecutarBusqueda(query);
+  }
+
   onBuscarSubmit(): void {
-    const q = this.terminoBusqueda.trim();
-    const cat = this.categoriaFiltro();
-    const queryParams: Record<string, string> = {};
-    if (q) queryParams['q'] = q;
-    if (cat !== 'Todas') queryParams['cat'] = cat;
-    this.router.navigate(['/catalogo'], { queryParams });
+    this.cancelarTemporizador();
+    const q = this.terminoBusqueda().trim();
+    this.ultimoQueryDeUrl = q;
+    this.ultimaCatDeUrl = this.categoriaFiltro();
+
+    if (q) {
+      this.sincronizarUrl(q, true);
+      void this.ejecutarBusqueda(q);
+    } else {
+      this.solicitudActualId++;
+      this.giphyHook.cancelar();
+      this.resultadosBusqueda.set(null);
+      this.sincronizarUrl('', true);
+    }
+  }
+
+  limpiarBusqueda(): void {
+    this.cancelarTemporizador();
+    this.solicitudActualId++;
+    this.giphyHook.cancelar();
+    this.terminoBusqueda.set('');
+    this.resultadosBusqueda.set(null);
+    this.ultimoQueryDeUrl = '';
+    this.ultimaCatDeUrl = this.categoriaFiltro();
+    this.sincronizarUrl('', true);
   }
 
   cambiarCategoria(valor: GifCategory | 'Todas'): void {
     this.categoriaFiltro.set(valor);
-    const q = this.terminoBusqueda.trim();
-    const queryParams: Record<string, string> = {};
-    if (q) queryParams['q'] = q;
-    if (valor !== 'Todas') queryParams['cat'] = valor;
-    this.router.navigate(['/catalogo'], { queryParams });
+    this.cancelarTemporizador();
+    const q = this.terminoBusqueda().trim();
+    this.ultimoQueryDeUrl = q;
+    this.ultimaCatDeUrl = valor;
+    this.sincronizarUrl(q, false);
+    if (q) {
+      void this.ejecutarBusqueda(q);
+    }
   }
 
   limpiarFiltros(): void {
-    this.terminoBusqueda = '';
+    this.cancelarTemporizador();
+    this.solicitudActualId++;
+    this.giphyHook.cancelar();
+    this.terminoBusqueda.set('');
     this.categoriaFiltro.set('Todas');
     this.rarezaFiltro.set('Todas');
     this.ordenSeleccionado.set('relevancia');
     this.resultadosBusqueda.set(null);
-    this.router.navigate(['/catalogo']);
+    this.ultimoQueryDeUrl = '';
+    this.ultimaCatDeUrl = 'Todas';
+    void this.router.navigate(['/catalogo']);
   }
 
   onToggleFavorite(nft: GifNft): void {

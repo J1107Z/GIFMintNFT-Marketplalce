@@ -23,10 +23,21 @@
         type="text"
         name="catalogQuery"
         class="form-control"
-        [(ngModel)]="terminoBusqueda"
-        placeholder="Buscar GIF-NFTs, colecciones o estilos..."
+        [value]="terminoBusqueda()"
+        (input)="alEscribir($event)"
+        autocomplete="off"
+        placeholder="Escribe para buscar GIF-NFTs en tiempo real..."
       />
-      <button type="submit" class="btn-mint-primary">Buscar</button>
+      @if (terminoBusqueda().length > 0) {
+        <button
+          type="button"
+          class="btn btn-outline-secondary bg-white border-start-0"
+          aria-label="Limpiar búsqueda"
+          (click)="limpiarBusqueda()"
+        >
+          ×
+        </button>
+      }
     </div>
 
     <div class="select-filters">
@@ -77,7 +88,7 @@
       <button
         type="button"
         class="tag-pill"
-        (click)="terminoBusqueda = tag; onBuscarSubmit()"
+        (click)="buscarSugerencia(tag)"
       >
         #{{ tag }}
       </button>
