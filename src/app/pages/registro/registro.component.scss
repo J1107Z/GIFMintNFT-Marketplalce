@@ -1,11 +1,16 @@
 @use 'styles/variables' as *;
 
 .brand-badge {
-  width: 46px;
-  height: 46px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, $color-primario, $color-mint);
-  color: #ffffff;
-  font-size: to-rem(22px);
+  width: 48px;
+  height: 48px;
+  border-radius: 13px;
+  overflow: hidden;
   @include flex-centro;
+
+  .brand-logo {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+  }
 }

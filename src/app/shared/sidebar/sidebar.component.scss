@@ -23,14 +23,19 @@
     margin-bottom: space(2);
 
     .brand-mark {
-      width: 34px;
-      height: 34px;
-      border-radius: 9px;
-      background: linear-gradient(135deg, $color-primario, $color-mint);
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      overflow: hidden;
       @include flex-centro;
-      font-size: to-rem(18px);
-      color: #ffffff;
       flex-shrink: 0;
+
+      .brand-logo {
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: contain;
+      }
     }
 
     .brand-info {
