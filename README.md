@@ -13,6 +13,14 @@ Cada GIF obtenido desde GIPHY es enriquecido determinísticamente con atributos 
 
 ---
 
+## Metodología de Trabajo Colaborativo (VS Code Live Share)
+
+Los dos integrantes (**Julian Andres Zapata Posada — 2240291** y **Yeick Jacson Moreno Ruiz — 2240991**) desarrollaron el proyecto de forma simultánea y colaborativa en tiempo real utilizando la extensión **Live Share de Visual Studio Code** sobre el mismo entorno de trabajo.
+
+Por este motivo, todo el desarrollo, pruebas y correcciones se consolidaron directamente en la rama principal (`main`) desde la sesión compartida, en lugar de mantener ramas separadas por integrante.
+
+---
+
 ## Enlaces del Proyecto
 
 - **Propuesta Gráfica Definitiva:** [docs/propuesta-grafica.png](./docs/propuesta-grafica.png)
